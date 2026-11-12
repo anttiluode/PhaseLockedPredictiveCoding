@@ -1,0 +1,16 @@
+name: Phase-locked predictive coding — tests
+on:
+  push:
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check core.js
+      - run: node tests/test_core.cjs
+      - run: node experiments/benchmark.cjs
+      - run: node --check demo.js
