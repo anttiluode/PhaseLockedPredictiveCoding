@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#091522">
+<title>Phase-Locked Predictive Coding | Turning Tree Lab</title>
+<style>
+:root{color-scheme:dark;--bg:#07111e;--panel:#102035;--line:#2e4960;--ink:#eef6ff;--muted:#a2bad0;--mint:#76e6cd;--pink:#fd7faf;--amber:#f5bf7c}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 58% -20%,#234755 0,#0a1928 39%,#07111e 88%);color:var(--ink);font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1250px;margin:0 auto;padding:30px 20px 75px}
+a{color:#87e2df}.eyebrow{font:700 11px/1.6 system-ui;color:var(--mint);letter-spacing:.19em;text-transform:uppercase}
+h1{font-size:clamp(34px,5.6vw,72px);line-height:1.08;letter-spacing:-.052em;margin:8px 0 13px;font-weight:740}
+h2{font-size:clamp(20px,2.9vw,26px);margin:0 0 8px;font-weight:690;letter-spacing:-.028em}
+h3{font-size:14px;margin:0 0 7px}.lede{font-size:clamp(16px,2vw,19px);color:#d1e4ef;max-width:880px;margin:0 0 12px}
+p{color:var(--muted);margin:7px 0 15px}small,.small{font-size:12px;color:#98b5c5}.disclaimer{max-width:880px}
+.hero{padding:8px 3px 25px}
+.pill{border:1px solid #34596c;background:#132b3b;color:#9de8d8;padding:5px 11px;border-radius:999px;font-size:12px;white-space:nowrap;display:inline-block}
+.frame{border:1px solid var(--line);background:linear-gradient(137deg,#14283b,#0d1b2d);box-shadow:0 8px 30px #0003;border-radius:18px;padding:21px;margin:15px 0}
+.flex{display:flex;flex-wrap:wrap;gap:11px;align-items:center}.sectionHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.controls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:15px 0}
+.control{padding:12px;border-radius:12px;border:1px solid #344d62;background:#0b1a2c;min-width:0}
+label{display:block;color:#bcd1e2;font-size:12px;font-weight:650;margin:0 0 7px}
+select,button{font:inherit;background:#203a50;border:1px solid #48667a;color:#eff8ff;padding:9px 12px;border-radius:9px;cursor:pointer;max-width:100%}
+select{width:100%}button:hover{background:#31516b}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+input[type=range]{width:100%;accent-color:var(--mint);cursor:pointer}
+.toggle{display:flex;align-items:center;gap:8px;margin:9px 0;font-size:13px;color:#d6e5ee}
+.toggle input{accent-color:var(--mint)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 0 0}
+button.primary{background:#236553;border-color:#4cb99d;color:#e2fff4;font-weight:700}
+.readout{font:700 14px/1.5 ui-monospace,Consolas,monospace;color:#b8f8e4}
+.monitor{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.surface{background:#081929;border:1px solid #315066;border-radius:13px;padding:14px;min-width:0}
+.surfaceHeader{display:flex;justify-content:space-between;gap:8px;color:#e3f2fb;font-weight:680;font-size:14px;padding-bottom:11px}
+.canvasbox{display:flex;align-items:center;justify-content:center;background:#06111e;border:1px solid #183248;border-radius:9px;aspect-ratio:1.2;overflow:hidden}
+canvas.pixel{width:min(100%,305px);height:auto;aspect-ratio:1;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.labelSmall{font-size:12px;color:#9bb7cb;margin-top:10px;min-height:39px}
+.stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;margin-top:13px}
+.stat{background:#0b192a;border:1px solid #29475b;border-radius:11px;padding:11px 12px}
+.stat .num{font-size:clamp(15px,2.8vw,25px);font-weight:730;line-height:1.3;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+.stat .key{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.3}
+#status{color:#b1f0df;min-height:22px;font-size:13px}
+.bottom{display:grid;grid-template-columns:300px 1fr;gap:14px}
+.gearpanel{display:flex;flex-direction:column;align-items:center;gap:5px;background:#0b192a;border:1px solid #2d4c62;border-radius:13px;padding:11px}
+#gear{display:block;width:245px;max-width:100%;height:auto}
+#complex{font:600 17px/1.4 ui-monospace,Consolas,monospace;color:#78e6d1}
+#spark{width:100%;height:auto;display:block;background:#0c192a;border-radius:9px}
+.legend{display:flex;gap:17px;flex-wrap:wrap;color:#bdd0df;font-size:12px;margin-top:6px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.twoCol{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.rule{font-family:ui-monospace,Consolas,monospace;color:#c9f5e4;background:#091a2b;padding:11px 13px;border-radius:9px;overflow:auto}
+footer{border-top:1px solid #355065;margin-top:28px;padding-top:18px;font-size:12px;color:#9bb6cc}
+@media(max-width:1000px){.controls{grid-template-columns:repeat(3,1fr)}.stats{grid-template-columns:repeat(3,1fr)}.bottom{grid-template-columns:1fr}.gearpanel{flex-direction:row;flex-wrap:wrap;justify-content:center}}
+@media(max-width:670px){.monitor{grid-template-columns:1fr}.canvasbox{aspect-ratio:1.7}.controls{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(2,1fr)}.twoCol{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+<div class="eyebrow">Geometric Neuron lineage / a controlled phase experiment</div>
+<h1>One clock.<br>Thousands of memories.</h1>
+<p class="lede">A central phase vector chooses when to read a field of local XOR memories. Does correcting a shared timing error eliminate false surprise while leaving real local changes visible?</p>
+<div class="flex">
+<span class="pill">64 × 64 pixels</span><span class="pill">4 bit planes per pixel</span>
+<span class="pill">16,384 logical rings</span><span class="pill">±1 phase turntable</span>
+</div>
+<p class="disclaimer small">This is an explicit global template-alignment controller with reduced band-window XOR storage—not unchanged GN27 neurons, an automatically learned clock, a Kalman filter, or a demonstrated biological theta–gamma mechanism. The readout phase is selected by comparing three stored frames.</p>
+</header>
+<section class="frame">
+ <div class="sectionHead"><div><h2>01 / The turning-tree laboratory</h2><p>First two laps train the 16-step memory without jitter. Afterward introduce jitter, an unexpected patch, or independent motion. The hub never receives the true phase shift; it infers it by comparing world against memory.</p></div><span id="status" role="status">Training scene</span></div>
+ <div class="controls">
+  <div class="control"><label for="scene">Periodic world</label><select id="scene"><option value="orbit">Two orbiting moons</option><option value="polar">Turning polar checker</option><option value="still">Stationary crescent (ambiguous phase)</option></select></div>
+  <div class="control"><label for="mode">Compare with</label><select id="mode"><option value="hub">Shared phase hub ±1</option><option value="raw">Fixed phase (no hub)</option></select></div>
+  <div class="control"><label for="jitter">Global timing variation <span id="jitterValue">±1</span></label><input id="jitter" type="range" min="0" max="2" value="1" step="1"><span class="small">±2 deliberately exceeds hub range</span></div>
+  <div class="control"><label>Event and learning controls</label><label class="toggle"><input id="intrusion" type="checkbox" checked> Inject repeated 8×8 surprises</label><label class="toggle"><input id="feedback" type="checkbox" checked> XOR feedback writes residual</label></div>
+  <div class="control"><label>Challenge the one-clock assumption</label><label class="toggle"><input id="split" type="checkbox"> Top +1, bottom −1 tick</label><span id="intrusionDesc" class="small">One 8×8 patch every 23 ticks</span></div>
+ </div>
+ <div class="actions">
+  <button class="primary" id="run">Pause</button>
+  <button id="step">Single step</button>
+  <button id="reset">Reset and relearn</button>
+  <button id="burst">Inject local patch next tick</button>
+  <span class="readout">tick <span id="tick">0</span> · lap <span id="lap">0</span></span>
+ </div>
+ <div class="monitor">
+  <div class="surface"><div class="surfaceHeader"><span>01 / World W</span><span style="color:#7fe7d7">INPUT</span></div><div class="canvasbox"><canvas id="cvWorld" class="pixel" width="64" height="64" aria-label="Actual observed world frame"></canvas></div><div class="labelSmall">Scene observed at a potentially shifted phase, plus optional genuine local novelty.</div></div>
+  <div class="surface"><div class="surfaceHeader"><span>02 / Read from memory R</span><span style="color:#f5bf7c">PREDICTION</span></div><div class="canvasbox"><canvas id="cvPrediction" class="pixel" width="64" height="64" aria-label="Stored frame selected by the shared phase controller"></canvas></div><div class="labelSmall">All 16,384 bit-plane memories read the <em>same</em> selected frame slot.</div></div>
+  <div class="surface"><div class="surfaceHeader"><span>03 / Residual XOR</span><span style="color:#ff91b2">SURPRISE</span></div><div class="canvasbox"><canvas id="cvError" class="pixel" width="64" height="64" aria-label="Unexplained bit mismatches after the selected phase shift"></canvas></div><div class="labelSmall">Pink means mismatch after alignment. Not every pink bit is guaranteed to represent real external novelty.</div></div>
+ </div>
+ <div class="stats">
+  <div class="stat"><div class="num" id="rawNow">—</div><div class="key">Current fixed-clock errors</div></div>
+  <div class="stat"><div class="num" id="hubNow">—</div><div class="key">Current selected-clock errors</div></div>
+  <div class="stat"><div class="num" id="seenShift">—</div><div class="key">Generated phase offset (test oracle)</div></div>
+  <div class="stat"><div class="num" id="chosenShift">—</div><div class="key">Hub selected offset</div></div>
+  <div class="stat"><div class="num" id="falseTotal">0</div><div class="key">Residual bits outside inserted patch, cumulative</div></div>
+  <div class="stat"><div class="num" id="detected">0 / 0</div><div class="key">Inserted novelty bits detected, cumulative</div></div>
+ </div>
+</section>
+<section class="frame">
+ <div class="sectionHead"><div><h2>02 / The central state Z</h2><p>The dashed amber pointer is the ordinary lap phase. The mint pointer shows the chosen readout phase. No pixel memory needs to independently estimate the shift.</p></div><span class="pill">A timing address, not a learned world model</span></div>
+ <div class="bottom">
+  <div class="gearpanel"><canvas id="gear" width="260" height="260" aria-label="Concentric global phase clock with 16 stored positions"></canvas><div><span class="small">Shared complex phase Z</span><div id="complex">1.00 + 0.00i</div><div class="small">Memory address <span id="phaseSlot">0 / 16</span></div></div></div>
+  <div class="surface">
+   <h3>Apparent surprise over time</h3>
+   <canvas id="spark" width="800" height="230" aria-label="Time series of raw and phase-aligned residual counts"></canvas>
+   <div class="legend"><span><i class="dot" style="background:#d99f70"></i>Fixed clock: raw XOR</span><span><i class="dot" style="background:#67dfc6"></i>Selected clock: residual XOR</span></div>
+   <p class="small">Both traces are evaluated from the live memory state before each write. The controller sees only the current world and stored patterns. Press “Inject local patch” to test whether unexpected bits remain after alignment.</p>
+  </div>
+ </div>
+</section>
+<section class="frame">
+ <h2>03 / What the circuit computes</h2>
+ <div class="twoCol">
+  <div><h3>Top-down phase selection</h3><div class="rule">δ* = argmin δ∈{−1,0,+1}<br>Hamming(Wₜ, R[t + δ])</div><p>Each candidate is a complete stored frame. A single winning offset is broadcast to all bit-plane memories.</p></div>
+  <div><h3>Local windowed XOR update</h3><div class="rule">eᵢ = Wᵢ XOR Rᵢ[t + δ*]<br>Rᵢ' = Rᵢ XOR eᵢ = Wᵢ</div><p>The update is computed by a truth-table equivalent of the original reduced window band's write/erase response. This does not learn a new period or a motion law.</p></div>
+ </div>
+ <p><strong style="color:#e3f5ff">Three ways to break it:</strong> ±2 timing changes exceed the hub's ±1 search range; two independently shifted regions cannot both be aligned by one global offset; and an actual scene change that exactly matches another stored phase is observationally indistinguishable from timing jitter. These limitations are part of the experiment, not hidden bugs.</p>
+ <p class="small">The complete matched controls are in <a href="https://github.com/anttiluode/PhaseLockedPredictiveCoding/blob/main/experiments/benchmark.cjs">the deterministic benchmark</a>. It also compares a per-pixel independent phase choice and a three-tick sustained-error filter, showing when each suppresses genuine novelty. The animated page is a reduced visual laboratory, not a measured energy-efficiency result.</p>
+</section>
+<footer><a href="https://github.com/anttiluode/PhaseLockedPredictiveCoding">Source and automated scientific checks</a> · <a href="https://github.com/anttiluode/GoldGemini">GoldGemini</a> · <a href="https://github.com/anttiluode/GoldOpus">GoldOpus</a> · <a href="https://github.com/anttiluode/GoldSol">GoldSol</a> · MIT license. Offline HTML, no external libraries.</footer>
+</main>
+<script src="core.js"></script><script src="demo.js"></script>
+</body>
+</html>
