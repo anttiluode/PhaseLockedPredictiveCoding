@@ -2,9 +2,9 @@
 
 **12 November 2026.** A falsifiable, zero-dependency browser experiment inspired by the **main complex vector plus smaller circulating cogs** idea. It asks whether one common phase correction can explain a field of apparent prediction errors while leaving genuinely local changes visible.
 
-**Open the interactive lab:** https://anttiluode.github.io/PhaseLockedPredictiveCoding/
+**Interactive lab:** open `index.html` locally after downloading the repo. Once GitHub Pages is enabled, the intended public URL is https://anttiluode.github.io/PhaseLockedPredictiveCoding/ .
 
-**Status:** The fixed-template scientific benchmark and Node regression checks passed. GitHub Pages availability depends on repository Pages configuration and the deployment workflow. If not online, clone/download this repository and open index.html locally.
+**Status:** The fixed-template scientific benchmark and Node regression checks passed. The Pages publication workflow cannot create the Pages site using its GitHub Actions integration permissions; **the repository owner must enable it once**. In the repository: **Settings → Pages → Build and deployment → Source: GitHub Actions**. Then open **Actions → Publish offline visual laboratory → Run workflow**. Until then, the public Pages URL may be unavailable; this does not affect the local offline lab or tests.
 
 ## What we actually built
 
@@ -63,7 +63,7 @@ Open index.html directly from the filesystem for the live, locally rendered inst
 - experiments/benchmark.cjs — fixed-template comparison of raw, hub, independent-pixel and sustained-error detectors
 - RESULTS.md — measured ledger and cautions
 - .github/workflows/tests.yml — fast Node checks
-- .github/workflows/pages.yml — optional GitHub Pages deployment
+- .github/workflows/pages.yml — manual GitHub Pages deployment after owner enables Pages
 
 ## An interpretation of the turning-tree picture
 
