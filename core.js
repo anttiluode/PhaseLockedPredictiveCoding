@@ -153,7 +153,8 @@ class Loop {
   }
 }
 function bench({scene="orbit",seed=97,ticks=128,jitter=1,patchAt=[49,65,81],kind="global"}={}){
-  const frames=training(scene),rand=rng(seed),values=["raw","hub","local"];
+  const frames=training(scene),rand=rng(seed),values=["raw","hub","local","sustained_K3"];
+  const streak=new Uint8Array(PIX*4);
   const counts=Object.fromEntries(values.map(v=>[v,{tp:0,fp:0,fn:0,total:0,phaseCorrect:0}]));
   const examples=[];let prior=0;
   for(let t=0;t<ticks;t++){
@@ -164,7 +165,18 @@ function bench({scene="orbit",seed=97,ticks=128,jitter=1,patchAt=[49,65,81],kind
     const truth=new Uint8Array(PIX);
     for(let i=0;i<PIX;i++)truth[i]=world[i]^base[i];
     for(const mode of values){
-      const r=evalMode(mode,frames,world,t,prior);
+      const r=evalMode(mode==="sustained_K3"?"raw":mode,frames,world,t,prior);
+      if(mode==="sustained_K3"){
+        // Simple per-bit 3-sample persistence control, not Opus's integrated
+        // band neuron; filtered output can lose genuine one-frame novelty.
+        const filtered=new Uint8Array(PIX);let n=0;
+        for(let i=0;i<PIX;i++)for(let b=0;b<4;b++){
+          const j=4*i+b,bit=(r.masks[i]>>b)&1;
+          streak[j]=bit?Math.min(3,streak[j]+1):0;
+          if(streak[j]>=3){filtered[i]|=1<<b;n++;}
+        }
+        r.masks=filtered;r.error=n;
+      }
       if(mode==="hub"){prior=r.delta;counts.hub.phaseCorrect+=Number(r.delta===shift);}
       const c=categorize(r.masks,truth),a=counts[mode];
       a.tp+=c.tp;a.fp+=c.fp;a.fn+=c.fn;a.total+=r.error;
